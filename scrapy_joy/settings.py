@@ -68,8 +68,13 @@ WSGI_APPLICATION = 'scrapy_joy.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'data.db'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'scrapy_joy',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'OPTIONS': {'init_command': 'SET storage_engine=INNODB;'}
     }
 }
 
