@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% load filters %}
+
+{% block content %}
+    <div class="row">
+        <div data-example-id="togglable-tabs" class="bs-example bs-example-tabs">
+            <h2 class="text-center">月指数<small>(互联网理财收益率)</small></h2>
+            <hr style="width: 50%;"/>
+
+            <form action="." class="form-inline text-center" style="margin-top: -10px; margin-bottom: 20px;">
+                <div class="form-group">
+                    <div class="input-daterange input-group">
+                        <input type="text" class="input-small text-center" name="start_date" value="{{ start_date }}"/>
+                        <span class="add-on" style="height:20px">～</span>
+                        <input type="text" class="input-small text-center" name="end_date" value="{{ end_date }}"/>
+                    </div>
+                </div>
+                <button id="btn-submit" class="btn btn-default" type="submit">查询</button>
+            </form>
+
+            <ul class="nav nav-tabs" id="myTabs">
+                <li class="active">
+                    <a data-toggle="tab" role="tab" href="#chart">
+                        指标折线图
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" role="tab" href="#sta_table">
+                        指标汇总表
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" role="tab" href="#detail">
+                        明细报表
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <div id="chart" class="tab-pane fade in active">
+                    {% if not q %}
+                        <div style="height: 400px; text-align: center;">无数据</div>
+                    {% else %}
+                        <div id="main" style="height:400px"></div>
+                    {% endif %}
+                </div>
+
+                <div id="sta_table" class="tab-pane fade">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>月份</th>
+                            <th>统计期间</th>
+                            <th>分类</th>
+                            <th>期限</th>
+                            <th>投资利率</th>
+                        </tr>
+                        {% for data in table_data %}
+                            <tr>
+                                <td>{{ data.0 }}</td>
+                                <td>{{ data.1 }}</td>
+                                <td>{{ data.2 }}</td>
+                                <td>{{ data.3 }}</td>
+                                <td>{{ data.4|floatformat:2 }}%</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <div id="detail" class="tab-pane fade">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>统计时间</th>
+                            <th>分类</th>
+                            <th>平台</th>
+                            <th>期限</th>
+                            <th>投资利率</th>
+                        </tr>
+                        {% for data in q %}
+                        <tr>
+                            <td>{{ data.sta_date }}</td>
+                            <td>{{ data.category2 }}</td>
+                            <td>{{ data.site.name }}</td>
+                            <td>{{ data.term }}{{ data.get_term_unit_display }}</td>
+                            <td>{{ data.rate }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+
+    <script src="/static/www/js/echarts.js"></script>
+
+    <script type="text/javascript">
+
+        function get_sta_time(month) {
+            var len = month.length;
+            var year = month.slice(0, 4);
+            month = len == 7 ? month.slice(-2, -1) : month.slice(-3, -1)
+            var day = new Date(year, month, 1)
+            return day
+        }
+
+        var month_list = {},
+            chart_data = {{ chart_data|to_json|safe }},
+            series = [],
+            legends = [];
+
+        for(var i=0; i<chart_data.length; i++) {
+            var item = chart_data[i];
+            var data = item.data;
+            var new_data = [];
+            for(var j=0; j<data.length; j++) {
+                var row = data[j];
+                new_data.push([get_sta_time(row[0]), row[1]])
+                month_list[get_sta_time(row[0])] = row[0]
+            }
+            item.data = new_data;
+            series.push(item);
+            legends.push(item.name);
+        }
+
+        require.config({
+            paths: {
+                echarts: '/static/js'
+            }
+        });
+        require(
+            [
+                'echarts',
+                'echarts/chart/line'
+            ],
+            function (ec) {
+                var myChart = ec.init(document.getElementById('main'));
+                option = {
+                    tooltip : {
+                        trigger: 'item',
+                        formatter : function (params) {
+                            return month_list[params.value[0]] + '<br/>' + params.seriesName +
+                                    ': &nbsp;<span style="color:red;">' + params.value[1].toFixed(2) + '%</span>';
+                        }
+                    },
+                    legend : {data : legends, y: 'bottom'},
+                    xAxis : [{
+                        type : 'time',
+                        splitNumber:10,
+                        boundaryGap: [1, 1],
+                        axisLabel : {
+                            formatter: function (value){
+                                return month_list[value];
+                            }
+                        }
+                    }],
+                    yAxis : [{
+                            type : 'value',
+                            axisLabel : {formatter: '{value} %'}
+                    }],
+                    series :  series
+                };
+                myChart.setOption(option);
+            }
+        );
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#menu-{{ current_menu }}").addClass("active");
+
+            $('.input-daterange input').each(function() {
+                $(this).datepicker({format: "yyyy-mm-dd"});
+            });
+        });
+    </script>
+{% endblock %}

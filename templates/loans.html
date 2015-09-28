@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div data-example-id="togglable-tabs" class="bs-example bs-example-tabs">
+            <h2 class="text-center">标的采集原始数据</h2>
+            <hr style="width: 50%;"/>
+
+            <table class="table table-striped">
+                <tr>
+                    <th>ID</th>
+                    <th>平台</th>
+                    <th>标的名称</th>
+                    <th>分类</th>
+                    <th>金额</th>
+                    <th>期限</th>
+                    <th>时间</th>
+                    <th>利率</th>
+                    <th></th>
+                </tr>
+                {% for loan in q %}
+                    <tr>
+                        <td>{{ loan.id }}</td>
+                        <td>{{ loan.site }}</td>
+                        <td>{{ loan.title }}</td>
+                        <td>{{ loan.category2 }}</td>
+                        <td>{{ loan.amount }}元</td>
+                        <td>{{ loan.duration }}天</td>
+                        <td>{{ loan.created }}</td>
+                        <td>{{ loan.year_rate }}%</td>
+                        <td><a href="{{ loan.url }}" target="_blank">查看</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#menu-{{ current_menu }}").addClass("active");
+        });
+    </script>
+{% endblock %}

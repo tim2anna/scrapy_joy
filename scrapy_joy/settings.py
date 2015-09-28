@@ -47,7 +47,9 @@ INSTALLED_APPS = (
     'scrapy_joy',
     'open_news',
     'open_loan',
+    'open_insurance',
 )
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -69,7 +71,7 @@ WSGI_APPLICATION = 'scrapy_joy.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'scrapy_joy',
+        'NAME': 'scrapy_joy2',
         'USER': 'root',
         'PASSWORD': '123456',
         'HOST': '127.0.0.1',
@@ -101,6 +103,11 @@ TIME_FORMAT = 'H:i'
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+    '/var/www/static/',
+)
+
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
@@ -120,3 +127,8 @@ BROKER_USER = "guest"
 BROKER_PASSWORD = "guest"
 BROKER_VHOST = "/"
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+
+try:
+    from local_settings import *
+except:
+    pass

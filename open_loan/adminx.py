@@ -2,33 +2,35 @@
 # -*- coding: utf-8 -*-
 
 import xadmin
-from open_loan.models import Loan
+from open_loan.models import Loan, LoanCategory, LoanScraper, LoanWebsite
 
 
 class LoanAdmin(object):
-    list_display = ('created', 'loan_website', 'title', 'amount', 'year_rate', 'duration')
+    list_display = ('created', 'loan_scraper', 'title', 'amount', 'year_rate', 'duration')
     list_display_links = ('created',)
 
-    list_filter = ['created', 'loan_website__site']
+    list_filter = ['created']
     actions = None
     aggregate_fields = {"year_rate": "avg", "amount": "sum",}
 
     refresh_times = (3, 5, 10)
-    # data_charts = {
-    #     "per_day": {
-    #         'title': u"日趋势图(年利率)",
-    #         "x-field": "_chart_month",
-    #         "y-field": ("year_rate", ),
-    #         "order": ('created',),
-    #         "option": {
-    #             "series": {"lines": {'show': True, }},
-    #             "xaxis": {"aggregate": "avg", "mode": "categories"},
-    #         },
-    #     },
-    # }
-
-    def _chart_month(self,obj):
-        return obj.created.strftime("%m-%d")
-
 
 xadmin.site.register(Loan, LoanAdmin)
+
+
+class LoanCategoryAdmin(object):
+    exclude = ('fullname', )
+
+xadmin.site.register(LoanCategory, LoanCategoryAdmin)
+
+
+class LoanScraperAdmin(object):
+    list_display = ('name', 'url', 'site', 'category1', 'category2')
+
+xadmin.site.register(LoanScraper, LoanScraperAdmin)
+
+
+class LoanWebsiteAdmin(object):
+    list_filter = ['area']
+
+xadmin.site.register(LoanWebsite, LoanWebsiteAdmin)

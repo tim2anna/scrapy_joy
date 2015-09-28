@@ -18,6 +18,15 @@ if not hasattr(processors, 'lambda_str'):
     setattr(processors, 'lambda_str', lambda_str)
 
 
+try:
+    from dynamic_scraper import migrations
+    import shutil
+    shutil.rmtree(migrations.__dict__['__path__'][0])
+    print '######', u'删除migrations'
+except:
+    pass
+
+
 ###############################################
 # fix xadmin bug：启动时报AppRegistryNotReady错误
 ###############################################
@@ -44,3 +53,31 @@ def get_user_model():
         return getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 setattr(auth, 'get_user_model', get_user_model)
+
+
+################################################################
+# fix xadmin bug：AuthenticationForm没有check_for_test_cookie方法
+################################################################
+from django.contrib.auth.forms import AuthenticationForm
+
+
+def check_for_test_cookie(self):
+    pass
+
+setattr(AuthenticationForm, 'check_for_test_cookie', check_for_test_cookie)
+
+
+from django.http import HttpResponse
+
+
+def __init__(self, content=b'', *args, **kwargs):
+    if 'mimetype' in kwargs:
+        mimetype = kwargs.pop('mimetype')
+        kwargs['content_type'] = mimetype
+    super(HttpResponse, self).__init__(*args, **kwargs)
+    self.content = content
+
+setattr(HttpResponse, '__init__', __init__)
+
+
+

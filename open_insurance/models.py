@@ -27,11 +27,18 @@ class InsuranceWebsite(models.Model):
 
 
 class Insurance(models.Model):
+    TERM_UNIT_CHOICES = (
+        ('day', u'天'),
+        ('month', u'月'),
+    )
+
     insurance_website = models.ForeignKey(InsuranceWebsite, verbose_name=u'保险平台')
     title = models.CharField(u'借款标题', max_length=200)
     amount = models.FloatField(u'金额(元)', default=0)
     year_rate = models.FloatField(u'年利率%', default=0)
     duration = models.IntegerField(u'期限(天)', default=0)
+    term = models.IntegerField(u'期限', default=0)
+    term_unit = models.CharField(u'期限单位', max_length=10, choices=TERM_UNIT_CHOICES)
     url = models.URLField(u'链接地址', blank=True)
     checker_runtime = models.ForeignKey(SchedulerRuntime, blank=True, null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(u'录入时间', auto_now_add=True)
@@ -59,3 +66,12 @@ def pre_delete_handler(sender, instance, using, **kwargs):
             instance.checker_runtime.delete()
             
 pre_delete.connect(pre_delete_handler)
+
+
+@receiver(pre_save, sender=Insurance, dispatch_uid='open_insurance.insurance')
+def loan_push_product(sender, **kwargs):
+    instance = kwargs.get('instance')
+    if instance.term_unit == 'day':
+        instance.duration = instance.term
+    elif instance.term_unit == 'month':
+        instance.duration = int(instance.term)*30

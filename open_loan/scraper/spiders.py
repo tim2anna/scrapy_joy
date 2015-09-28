@@ -1,5 +1,5 @@
 from dynamic_scraper.spiders.django_spider import DjangoSpider
-from open_loan.models import LoanWebsite, Loan, LoanItem
+from open_loan.models import LoanScraper, Loan, LoanItem
 
 
 class LoanSpider(DjangoSpider):
@@ -7,7 +7,7 @@ class LoanSpider(DjangoSpider):
     name = 'loan_spider'
 
     def __init__(self, *args, **kwargs):
-        self._set_ref_object(LoanWebsite, **kwargs)
+        self._set_ref_object(LoanScraper, **kwargs)
         self.scraper = self.ref_object.scraper
         self.scrape_url = self.ref_object.url
         self.scheduler_runtime = self.ref_object.scraper_runtime
