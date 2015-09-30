@@ -38,7 +38,7 @@ class LoanWebsite(models.Model):
     area = models.CharField(u'地域', max_length=20, default='')
 
     def __unicode__(self):
-        return self.name + '[' + str(self.area) + ']'
+        return self.name
 
     class Meta:
         verbose_name = u'网贷平台'
@@ -99,6 +99,10 @@ class LoanItem(DjangoItem):
 @receiver(pre_save, sender=Loan, dispatch_uid='open_loan.loan')
 def loan_push_product(sender, **kwargs):
     instance = kwargs.get('instance')
+
+    if instance.term_unit not in ['day', 'month']:
+        exec(instance.loan_scraper.scraper.comments)
+
     if instance.term_unit == 'day':
         instance.duration = instance.term
     elif instance.term_unit == 'month':

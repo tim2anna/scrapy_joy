@@ -221,7 +221,7 @@ def loans(request):
     else:
         end_date = date.today()
 
-    q = Loan.objects.filter(created__range=(start_date, end_date))
+    q = Loan.objects.all()
 
     return render_to_response('loans.html', locals(), context_instance=RequestContext(request))
 

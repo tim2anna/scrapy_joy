@@ -18,6 +18,17 @@ if not hasattr(processors, 'lambda_str'):
     setattr(processors, 'lambda_str', lambda_str)
 
 
+def url_hour_arg(text, loader_context):
+    """ 加上小时的时间戳 """
+    from datetime import datetime
+    url = loader_context.get('url_hour_arg', '')
+    return url + '#' + datetime.now().strftime('%Y%m%d%H')
+
+if not hasattr(processors, 'url_hour_arg'):
+    setattr(processors, 'url_hour_arg', url_hour_arg)
+
+
+
 try:
     from dynamic_scraper import migrations
     import shutil
