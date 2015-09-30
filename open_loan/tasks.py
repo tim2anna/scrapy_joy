@@ -9,14 +9,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scrapy_joy.settings")
 django.setup()
 
 from dynamic_scraper.utils.task_utils import TaskUtils
-from open_loan.models import LoanWebsite, Loan, StaDayData, LoanCategory
+from open_loan.models import LoanScraper, Loan, StaDayData, LoanCategory, LoanWebsite
 from datetime import date, timedelta
 
 
 @task()
 def run_spiders():
     t = TaskUtils()
-    t.run_spiders(LoanWebsite, 'scraper', 'scraper_runtime', 'loan_spider')
+    t.run_spiders(LoanScraper, 'scraper', 'scraper_runtime', 'loan_spider')
 
 
 @task()
