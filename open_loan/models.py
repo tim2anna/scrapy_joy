@@ -129,3 +129,8 @@ class StaDayData(models.Model):
     term = models.IntegerField(u'期限', default=0)
     term_unit = models.CharField(u'期限单位', max_length=10, choices=TERM_UNIT_CHOICES)
     rate = models.FloatField(u'利率', null=True, blank=True)
+
+
+class SubscribeEmail(models.Model):
+    email = models.EmailField(u'邮箱')
+    created = models.DateTimeField(u'订阅时间', auto_now_add=True)

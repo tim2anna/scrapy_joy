@@ -79,3 +79,62 @@ a:focus {
    outline:none;
     -moz-outline:none;
 }
+
+.mini-box {
+    min-height: 105px;
+    padding: 15px;
+}
+
+.panel {
+    margin-bottom: 20px;
+    background-color: rgb(255, 255, 255);
+    border-image-source: initial;
+    border-image-slice: initial;
+    border-image-width: initial;
+    border-image-outset: initial;
+    border-image-repeat: initial;
+    border-radius: 2px;
+    box-shadow: rgba(0, 0, 0, 0.0470588) 0px 1px 1px;
+    border: 1px solid #ddd;
+}
+
+.mini-box .box-icon {
+    display: block;
+    float: left;
+    margin: 0px 10px 10px 0px;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    line-height: 65px;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 35px;
+}
+
+.bg-success {
+    background-color: rgb(35, 174, 137);
+    color: rgb(255, 255, 255);
+}
+
+.bg-info {
+    background-color: rgb(46, 193, 204);
+    color: rgb(255, 255, 255);
+}
+
+.bg-warning {
+    background-color: rgb(255, 182, 28);
+    color: rgb(255, 255, 255);
+}
+
+.bg-danger {
+    background-color: rgb(233, 75, 59);
+    color: rgb(255, 255, 255);
+}
+
+.size-h2 {
+    font-size: 30px;
+}
+
+.mini-box .box-info p {
+    margin: 0px;
+}

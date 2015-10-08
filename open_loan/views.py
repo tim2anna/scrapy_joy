@@ -1,41 +1,39 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import json
 from datetime import date, timedelta, datetime
 from collections import OrderedDict
 
 from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, HttpResponse
+from django.db.models import Sum, Avg
 
-from open_loan.models import Loan, LoanWebsite, StaDayData
+from open_loan.models import Loan, LoanWebsite, StaDayData, SubscribeEmail
 from open_loan.helpers import get_sta_time_by_week, get_sta_time_by_month
+from open_loan.forms import SubscribeForm
 
 
 def index(request):
-    # start_date = request.GET.get('start_date')
-    # if start_date:
-    #     start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-    # else:
-    #     start_date = date.today() - timedelta(days=7)
-    #
-    # end_date = request.GET.get('end_date')
-    # if end_date:
-    #     end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-    # else:
-    #     end_date = date.today()
-    #
-    # for day in range((end_date-start_date).days):
-    #     print day
-    #
-    # sites = LoanWebsite.objects.all()
-    #
-    # sites = dict([(site.id, {'loans': [], 'site': site, 'category': site.category}) for site in sites])
-    #
-    # loans = Loan.objects.filter(created__range=(start_date, end_date))
-    # for loan in loans:
-    #     sites[loan.loan_website_id]['loans'].append(loan)
-    #
-    # sites = sites.values()
+    today = date.today()
+
+    website_cnt = LoanWebsite.objects.count()
+    loan_cnt = Loan.objects.count()
+
+    last_week_start_date = today + timedelta(-7 - today.weekday())  # 上周星期一
+    last_week_end_date = today + timedelta(-today.weekday())  # 上周星期一
+
+    this_week_loans = Loan.objects.filter(created__gt=last_week_end_date)
+    last_week_loans = Loan.objects.filter(created__range=(last_week_start_date, last_week_end_date))
+
+    this_week_loan_cnt = this_week_loans.count()
+    last_week_loan_cnt = last_week_loans.count()
+
+    this_week_loan_rate = this_week_loans.aggregate(avg=Avg('year_rate'))['avg'] or 0
+    last_week_loan_rate = last_week_loans.aggregate(avg=Avg('year_rate'))['avg'] or 0
+
+    this_week_loan_amount = this_week_loans.aggregate(sum=Sum('amount'))['sum'] or 0
+    last_week_loan_amount = last_week_loans.aggregate(sum=Sum('amount'))['sum'] or 0
 
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
@@ -224,6 +222,22 @@ def loans(request):
     q = Loan.objects.all()
 
     return render_to_response('loans.html', locals(), context_instance=RequestContext(request))
+
+
+def subscribe(request):
+    """ 订阅 """
+    if request.method == 'POST':
+        form = SubscribeForm(data=request.POST)
+        if form.is_valid():
+            email = request.POST.get('email')
+            q = SubscribeEmail.objects.filter(email=email)
+            if q:
+                return HttpResponse(json.dumps({'status': 0, 'info': u'已订阅'}), content_type='application/json')
+            else:
+                SubscribeEmail.objects.create(email=email)
+                return HttpResponse(json.dumps({'status': 1, 'info': u'订阅成功'}), content_type='application/json')
+        else:
+            return HttpResponse(json.dumps({'status': 0, 'info': u'邮箱格式错误'}), content_type='application/json')
 
 
 
