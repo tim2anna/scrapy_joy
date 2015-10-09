@@ -13,10 +13,12 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scrapy_joy.settings")
 django.setup()
 
-from celery import Celery
+from celery import Celery, platforms
 from django.conf import settings
 
 app = Celery('scrapy_joy')
+
+platforms.C_FORCE_ROOT = True
 
 # Using a string here means the worker will not have to pickle the object when using Windows.
 app.config_from_object('django.conf:settings')
