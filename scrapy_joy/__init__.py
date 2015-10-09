@@ -3,9 +3,6 @@
 
 from __future__ import absolute_import
 
-# This will make sure the app is always imported when
-# Django starts so that shared_task will use this app.
-from .celery import app as celery_app
 
 ##################################################
 # add django-dynamic-scraper function：lambda处理器
@@ -69,6 +66,11 @@ def get_user_model():
         return getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 setattr(auth, 'get_user_model', get_user_model)
+
+
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
+from .celery import app as celery_app
 
 
 ################################################################
