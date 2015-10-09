@@ -6,7 +6,6 @@ from __future__ import absolute_import
 import os, sys, django
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scrapy_joy.settings")
-django.setup()
 
 
 ##################################################
@@ -101,3 +100,4 @@ setattr(HttpResponse, '__init__', __init__)
 # This will make sure the app is always imported when
 # Django starts so that shared_task will use this app.
 from .celery import app as celery_app
+django.setup()
