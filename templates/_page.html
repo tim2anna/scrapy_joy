@@ -1,0 +1,36 @@
+<nav class="text-right">
+    <span style="display: inline-block; padding-top: 20px; vertical-align: top;">
+        总共 <strong class="text-info" style="font-size: 14px;">{{ curr_page.paginator.count }}</strong> 条记录
+    </span>
+    <ul class="pagination">
+        {% if curr_page.number == 1 %}
+            <li class="prev disabled" title="第一页">
+                <a href="#"><span aria-hidden="true">&laquo;</span></a>
+            </li>
+        {% else %}
+            <li class="prev" title="第一页">
+                <a href="{{ return_url }}&page=1"><span aria-hidden="true">&laquo;</span></a>
+            </li>
+        {% endif %}
+
+        {% for p in page_range %}
+            {% if p == curr_page.number %}
+                <li class="active"><a href="#">{{ p }}</a></li>
+            {% else %}
+                <li><a href="{{ return_url }}&page={{ p }}" title="第{{ p }}页">{{ p }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if curr_page.number == curr_page.paginator.num_pages %}
+            <li class="disabled">
+                <a href="#"><span aria-hidden="true">&raquo;</span></a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ return_url }}&page={{ curr_page.paginator.num_pages }}" title="最后一页" class="page-links">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>

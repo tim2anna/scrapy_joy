@@ -8,6 +8,7 @@ from collections import OrderedDict
 from django.template import RequestContext
 from django.shortcuts import render_to_response, HttpResponse
 from django.db.models import Sum, Avg
+from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 
 from open_loan.models import Loan, LoanWebsite, StaDayData, SubscribeEmail
 from open_loan.helpers import get_sta_time_by_week, get_sta_time_by_month
@@ -219,7 +220,22 @@ def loans(request):
     else:
         end_date = date.today()
 
-    q = Loan.objects.all()
+    page = int(request.GET.get('page', 1))
+
+    q = Loan.objects
+
+    q = q.order_by('-created')
+    paginator = Paginator(q, 15)
+    try:
+        curr_page = paginator.page(page)
+    except(EmptyPage, InvalidPage, PageNotAnInteger):
+        curr_page = paginator.page(1)
+    if page >= 5:
+        page_range = paginator.page_range[page - 5:page + 5]
+    else:
+        page_range = paginator.page_range[0:int(page) + 5]
+
+    return_url = '?start_date=%s&end_date=%s' % (start_date, end_date)
 
     return render_to_response('loans.html', locals(), context_instance=RequestContext(request))
 
