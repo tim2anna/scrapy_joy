@@ -8,11 +8,12 @@
 
 from __future__ import absolute_import
 
-import os
+import os, sys
 import django
 from celery import Celery
 from django.conf import settings
 
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 # 为Celery程序设置Django的默认配置
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scrapy_joy.settings")
