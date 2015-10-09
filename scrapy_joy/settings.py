@@ -29,7 +29,12 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
 # Application definition
 
 INSTALLED_APPS = (
@@ -117,17 +122,6 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(BASE_DIR, 'templates'),
 )
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-    }
-}
-
-
-# 为Celery程序设置Django的默认配置
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'scrapy_joy.settings')
 
 
 # django-celery settings

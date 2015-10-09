@@ -1,12 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
-import os
+import os, sys
 import django
 from celery.task import task
 
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scrapy_joy.settings")
 django.setup()
+
+
 
 from dynamic_scraper.utils.task_utils import TaskUtils
 from open_loan.models import LoanScraper, Loan, StaDayData, LoanCategory, LoanWebsite
