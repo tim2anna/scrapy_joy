@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """
 Django settings for scrapy_joy project.
 
@@ -121,6 +124,11 @@ CACHES = {
         'LOCATION': 'unique-snowflake',
     }
 }
+
+
+# 为Celery程序设置Django的默认配置
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'scrapy_joy.settings')
+
 
 # django-celery settings
 import djcelery
