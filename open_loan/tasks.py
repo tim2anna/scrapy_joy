@@ -11,6 +11,7 @@ from celery.task import task
 from dynamic_scraper.utils.task_utils import TaskUtils
 from open_loan.models import LoanScraper, Loan, StaDayData, LoanCategory, LoanWebsite
 from datetime import date, timedelta
+from django.db import transaction
 
 
 @task()
@@ -26,6 +27,7 @@ def run_checkers():
 
 
 @task()
+@transaction.commit_manually
 def run_sta_day_data(sta_day=(date.today() - timedelta(days=1))):
     # 删除该日期的统计数据，避免重复数据
     StaDayData.objects.filter(sta_date=sta_day).delete()
