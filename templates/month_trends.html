@@ -2,6 +2,27 @@
 
 {% load filters %}
 
+{% block css %}
+    <style>
+        #legend {
+            height:350px;
+            overflow-y: scroll;
+            border: 1px solid #ddd;
+        }
+        label.legend{
+            display:block;
+            font-weight: normal;
+            margin-left: 5px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        label.legend.disabled{color: #d3d3d3 !important;}
+        label.legend.disabled .label{background-color: #d3d3d3 !important;}
+        label.legend .label{width: 12px;height: 8px;margin-right: 5px;vertical-align: middle;margin-bottom: 2px;}
+        label.legend .label:empty{display: inline-block;}
+    </style>
+{% endblock %}
+
 {% block content %}
     <div class="row">
         <div data-example-id="togglable-tabs" class="bs-example bs-example-tabs">
@@ -38,11 +59,28 @@
             </ul>
 
             <div class="tab-content" id="myTabContent">
-                <div id="chart" class="tab-pane fade in active">
+                <div id="chart" class="tab-pane fade in active row">
                     {% if not q %}
                         <div style="height: 400px; text-align: center;">无数据</div>
                     {% else %}
-                        <div id="main" style="height:400px"></div>
+                        <div id="main" class="col-lg-10 col-sm-8 col-xs-12" style="height:400px; margin-right: -15px;"></div>
+                        <div class="col-lg-2 col-sm-4 col-xs-12">
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-xs-6">
+                                    <button id="btn-show" class="btn btn-default btn-xs" title="显示全部">
+                                        <i class="fa fa-eye"></i>
+                                        显示
+                                    </button>
+                                </div>
+                                <div class="col-xs-6">
+                                    <button id="btn-hide" class="btn btn-default btn-xs" title="隐藏全部">
+                                        <i class="fa fa-eye-slash"></i>
+                                        隐藏
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="legend"></div>
+                        </div>
                     {% endif %}
                 </div>
 
@@ -145,7 +183,7 @@
                                     ': &nbsp;<span style="color:red;">' + params.value[1].toFixed(2) + '%</span>';
                         }
                     },
-                    legend : {data : legends, y: 'bottom'},
+                    legend : {data : legends, y: 'bottom', show: false},
                     xAxis : [{
                         type : 'time',
                         splitNumber:10,
@@ -163,6 +201,46 @@
                     series :  series
                 };
                 myChart.setOption(option);
+
+                //divLegends
+                var divLegends = $("#legend");
+                var legend = myChart.chart['line'].component.legend;
+
+                $(option.legend.data).each(function(i, l){
+                    var color = legend.getColor(l);
+                    var labelLegend = $('<label class="legend">' +
+                            '<span class="label" style="background-color:'+color+'"></span>'+l+'</label>');
+                    labelLegend.mouseover(function(){
+                        labelLegend.css('color', color).css('font-weight', 'bold');
+                    }).mouseout(function(){
+                        labelLegend.css('color', '#333').css('font-weight', 'normal');
+                    }).click(function(){
+                        labelLegend.toggleClass('disabled');
+                        legend.setSelected(l, !labelLegend.hasClass('disabled'));
+                    });
+                    divLegends.append(labelLegend);
+                });
+
+                $("#btn-show").click(function() {
+                    $(option.legend.data).each(function(i, l) {
+                        legend.setSelected(l, true);
+                        $("label.legend").removeClass('disabled');
+                    });
+                });
+
+                $("#btn-hide").click(function() {
+                    $(option.legend.data).each(function(i, l) {
+                        legend.setSelected(l, false);
+                        $("label.legend").addClass('disabled');
+                    });
+                });
+
+                //restore
+                myChart.on('restore', function(param){
+                    divLegends.children('.legend').each(function(i, labelLegend){
+                        $(labelLegend).removeClass('disabled');
+                    });
+                });
             }
         );
     </script>

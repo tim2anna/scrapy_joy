@@ -56,6 +56,9 @@ class LoanScraper(models.Model):
     scraper = models.ForeignKey(Scraper, verbose_name=u'爬虫', blank=True, null=True, on_delete=models.SET_NULL)
     scraper_runtime = models.ForeignKey(SchedulerRuntime, blank=True, null=True, on_delete=models.SET_NULL)
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         verbose_name = u'标的爬虫'
         verbose_name_plural = u'标的爬虫'

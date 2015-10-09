@@ -9,7 +9,7 @@ class LoanAdmin(object):
     list_display = ('created', 'loan_scraper', 'title', 'amount', 'year_rate', 'duration')
     list_display_links = ('created',)
 
-    list_filter = ['created']
+    list_filter = ['created', 'site', 'category2']
     actions = None
     aggregate_fields = {"year_rate": "avg", "amount": "sum",}
 

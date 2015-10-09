@@ -57,7 +57,7 @@ def week_trends(request):
 
     q = StaDayData.objects.filter(
         category1=None, sta_date__range=(start_date, end_date)
-    ).order_by('-sta_date', 'category2')
+    ).order_by('category2', 'term', '-sta_date')
 
     # 明细数据
     week_dict, series_dict = OrderedDict(), OrderedDict()
@@ -142,7 +142,7 @@ def month_trends(request):
 
     q = StaDayData.objects.filter(
         category1=None, sta_date__range=(start_date, end_date)
-    ).order_by('-sta_date', 'category2')
+    ).order_by('-sta_date', 'category2', 'term')
 
     # 明细数据
     month_dict, series_dict = OrderedDict(), OrderedDict()
