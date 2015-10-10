@@ -99,5 +99,5 @@ setattr(HttpResponse, '__init__', __init__)
 
 # This will make sure the app is always imported when
 # Django starts so that shared_task will use this app.
-from .celery import app as celery_app
-django.setup()
+from celery import platforms
+platforms.C_FORCE_ROOT = True
