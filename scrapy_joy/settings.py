@@ -123,6 +123,16 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
 )
 
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'kaisa_rate@163.com'
+EMAIL_HOST_PASSWORD = 'dafcnranfmcvwrds'
+EMAIL_SUBJECT_PREFIX = u'[Kaisa利率]'
+DEFAULT_FROM_EMAIL = u'Kaisa利率 <kaisa_rate@163.com>'
+SERVER_EMAIL = 'kaisa_rate@163.com'
+
+HOST_NAME = 'http://127.0.0.1:8000'
+
 
 # django-celery settings
 import djcelery

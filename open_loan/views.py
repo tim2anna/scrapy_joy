@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_protect
 from open_loan.models import Loan, LoanWebsite, StaDayData, SubscribeEmail
 from open_loan.helpers import get_sta_time_by_week, get_sta_time_by_month
 from open_loan.forms import SubscribeForm
+from open_loan.tasks import send_week_email
 
 
 def index(request):
@@ -23,7 +24,7 @@ def index(request):
     loan_cnt = Loan.objects.count()
 
     last_week_start_date = today + timedelta(-7 - today.weekday())  # 上周星期一
-    last_week_end_date = today + timedelta(-today.weekday())  # 上周星期一
+    last_week_end_date = today + timedelta(-today.weekday())  # 上周星期天
 
     this_week_loans = Loan.objects.filter(created__gt=last_week_end_date)
     last_week_loans = Loan.objects.filter(created__range=(last_week_start_date, last_week_end_date))
@@ -249,6 +250,7 @@ def subscribe(request):
         if form.is_valid():
             email = request.POST.get('email')
             q = SubscribeEmail.objects.filter(email=email)
+            send_week_email.delay([email, ])
             if q:
                 return HttpResponse(json.dumps({'status': 0, 'info': u'已订阅'}), content_type='application/json')
             else:

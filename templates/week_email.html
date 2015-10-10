@@ -1,0 +1,58 @@
+{% load filters %}
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <style>
+        .block {
+            border-bottom: #ddd 2px solid;
+            border-left: #ddd 2px solid;
+            margin: 7px 0px 18px;
+            width: 556px;
+            background: #f3edea;
+            overflow: auto;
+            border-top: #ddd 2px solid;
+            border-right: #ddd 2px solid;
+            padding: 20px;
+        }
+
+        .block ul {
+            padding-bottom: 10px;
+            line-height: 2;
+            margin: 0px 0px 0px 22px;
+            padding-left: 0px;
+            padding-right: 0px;
+            color: #eb0000;
+            font-size: 14px;
+            padding-top: 10px
+        }
+    </style>
+</head>
+<body>
+
+<div class="block">
+    <h2 class="text-center">周指数</h2>
+    <ul>
+        <li>
+            <span style="color: #333">
+                【上周】平均利率：{{ last_week_loan_rate|floatformat:2 }} %
+            </span>
+        </li>
+        <li>
+            <span style="color: #333">
+                【上周】采集标的样本数：{{ last_week_loan_cnt }}
+            </span>
+        </li>
+        <li>
+            <span style="color: #333">
+                【上周】标的总金额：{{ last_week_loan_amount|floatformat:0|amount_split }}元
+            </span>
+        </li>
+    </ul>
+
+    <a href="{{ host_name }}/week_trends/">点击查看详情：{{ host_name }}/week_trends/</a>
+</div>
+
+</body>
+</html>

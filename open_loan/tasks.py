@@ -7,11 +7,17 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scrapy_joy.settings")
 django.setup()
 
+from datetime import date, timedelta
 from celery.task import task
 from dynamic_scraper.utils.task_utils import TaskUtils
-from open_loan.models import LoanScraper, Loan, StaDayData, LoanCategory, LoanWebsite
-from datetime import date, timedelta
+
 from django.db import transaction
+from django.db.models import Sum, Avg
+from django.core import mail
+from django.template import Context, loader
+
+from scrapy_joy import settings
+from open_loan.models import LoanScraper, Loan, StaDayData, LoanCategory, LoanWebsite, SubscribeEmail
 
 
 @task()
@@ -106,6 +112,71 @@ def run_sta_day_data(sta_day=(date.today() - timedelta(days=1))):
                     sta_cnt=len(item),
                 )
                 data.save()
+
+
+@task()
+def send_week_email(mail_list=[], today=date.today()):
+    """ 周指数邮件 """
+    if not mail_list:
+        mail_list = [obj.email for obj in SubscribeEmail.objects.all()]
+
+    subject = u'【Kaisa利率】周指数'
+
+    last_week_start_date = today + timedelta(-7 - today.weekday())  # 上周星期一
+    last_week_end_date = today + timedelta(-today.weekday())  # 上周星期一
+    last_week_loans = Loan.objects.filter(created__range=(last_week_start_date, last_week_end_date))
+    last_week_loan_cnt = last_week_loans.count()
+    last_week_loan_rate = last_week_loans.aggregate(avg=Avg('year_rate'))['avg'] or 0
+    last_week_loan_amount = last_week_loans.aggregate(sum=Sum('amount'))['sum'] or 0
+    host_name = settings.HOST_NAME
+
+    email_template_name = 'week_email.html'
+    t = loader.get_template(email_template_name)
+    html_content = t.render(Context(locals()))
+
+    conn = mail.get_connection()
+    conn.open()
+    msg_list = []
+    for to in mail_list:
+        msg = mail.EmailMultiAlternatives(subject, html_content, settings.DEFAULT_FROM_EMAIL, [to, ])
+        msg.attach_alternative(html_content, "text/html")
+        msg_list.append(msg)
+    conn.send_messages(msg_list)
+    conn.close()
+
+
+@task()
+def send_month_email(mail_list=[], today=date.today()):
+    """ 周指数邮件 """
+    if not mail_list:
+        mail_list = [obj.email for obj in SubscribeEmail.objects.all()]
+
+    subject = u'【Kaisa利率】月指数'
+
+    if today.month <= 1:
+        last_month_start_date = date(day=1, month=12, year=today.year-1)
+    else:
+        last_month_start_date = date(day=1, month=today.month-1, year=today.year)
+    last_month_end_date = date(day=1, month=today.month, year=today.year) - timedelta(days=1)  # 上月最后一天
+    last_month_loans = Loan.objects.filter(created__range=(last_month_start_date, last_month_end_date))
+    last_month_loan_cnt = last_month_loans.count()
+    last_month_loan_rate = last_month_loans.aggregate(avg=Avg('year_rate'))['avg'] or 0
+    last_month_loan_amount = last_month_loans.aggregate(sum=Sum('amount'))['sum'] or 0
+    host_name = settings.HOST_NAME
+
+    email_template_name = 'month_email.html'
+    t = loader.get_template(email_template_name)
+    html_content = t.render(Context(locals()))
+
+    conn = mail.get_connection()
+    conn.open()
+    msg_list = []
+    for to in mail_list:
+        msg = mail.EmailMultiAlternatives(subject, html_content, settings.DEFAULT_FROM_EMAIL, [to, ])
+        msg.attach_alternative(html_content, "text/html")
+        msg_list.append(msg)
+    conn.send_messages(msg_list)
+    conn.close()
 
 
 if __name__ == "__main__":
