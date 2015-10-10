@@ -101,3 +101,7 @@ setattr(HttpResponse, '__init__', __init__)
 # Django starts so that shared_task will use this app.
 from celery import platforms
 platforms.C_FORCE_ROOT = True
+
+from celery import current_app as celery
+
+django.setup()

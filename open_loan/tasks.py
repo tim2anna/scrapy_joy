@@ -27,7 +27,7 @@ def run_checkers():
 
 
 @task()
-@transaction.commit_manually
+@transaction.commit_on_success
 def run_sta_day_data(sta_day=(date.today() - timedelta(days=1))):
     # 删除该日期的统计数据，避免重复数据
     StaDayData.objects.filter(sta_date=sta_day).delete()
