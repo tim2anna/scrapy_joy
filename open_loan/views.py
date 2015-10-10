@@ -9,6 +9,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response, HttpResponse
 from django.db.models import Sum, Avg
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
+from django.views.decorators.csrf import csrf_protect
 
 from open_loan.models import Loan, LoanWebsite, StaDayData, SubscribeEmail
 from open_loan.helpers import get_sta_time_by_week, get_sta_time_by_month
@@ -240,6 +241,7 @@ def loans(request):
     return render_to_response('loans.html', locals(), context_instance=RequestContext(request))
 
 
+@csrf_protect
 def subscribe(request):
     """ 订阅 """
     if request.method == 'POST':
