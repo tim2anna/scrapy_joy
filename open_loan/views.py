@@ -220,11 +220,15 @@ def loans(request):
     if end_date:
         end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
     else:
-        end_date = date.today()
+        end_date = date.today() + timedelta(days=1)
+
+    site_id = [int(i) for i in request.REQUEST.getlist('site_id')]
 
     page = int(request.GET.get('page', 1))
 
-    q = Loan.objects
+    q = Loan.objects.filter(created__range=(start_date, end_date))
+    if site_id:
+        q = q.filter(site_id__in=site_id)
 
     q = q.order_by('-created')
     paginator = Paginator(q, 15)
@@ -237,7 +241,8 @@ def loans(request):
     else:
         page_range = paginator.page_range[0:int(page) + 5]
 
-    return_url = '?start_date=%s&end_date=%s' % (start_date, end_date)
+    return_url = '?start_date=%s&end_date=%s&%s' % (start_date, end_date, '&'.join(['site_id='+str(i)for i in site_id]))
+    site_list = LoanWebsite.objects.all()
 
     return render_to_response('loans.html', locals(), context_instance=RequestContext(request))
 

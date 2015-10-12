@@ -1,10 +1,33 @@
 {% extends 'base.html' %}
 
+{% block css %}
+
+    <link rel="stylesheet" href="/static/select2-3.5.4/select2.css">
+{% endblock %}
+
 {% block content %}
     <div class="row">
         <div data-example-id="togglable-tabs" class="bs-example bs-example-tabs">
             <h2 class="text-center">标的采集原始数据</h2>
             <hr style="width: 50%;"/>
+
+            <form action="." class="form-inline text-center" style="margin-top: -10px; margin-bottom: 20px;">
+                <div class="form-group">
+                    <div class="input-daterange input-group">
+                        <input type="text" class="text-center" name="start_date" value="{{ start_date }}"/>
+                        <span class="add-on" style="height:20px">～</span>
+                        <input type="text" class="text-center" name="end_date" value="{{ end_date }}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <select name="site_id" class="select2_site" multiple="multiple" style="width: 200px;">
+                        {% for site in site_list %}
+                            <option value="{{ site.id }}" {% if site.id in site_id %}selected {% endif %}>{{ site.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button id="btn-submit" class="btn btn-default" type="submit">查询</button>
+            </form>
 
             <table class="table table-striped">
                 <tr>
@@ -41,9 +64,19 @@
 {% endblock %}
 
 {% block js %}
+    <script type="text/javascript" src="/static/select2-3.5.4/select2.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $("#menu-{{ current_menu }}").addClass("active");
+
+            $('.input-daterange input').each(function() {
+                $(this).datepicker({format: "yyyy-mm-dd"});
+            });
+
+            $('.select2_site').select2({
+                placeholder: "输入搜索平台",
+                allowClear: true
+            });
         });
     </script>
 {% endblock %}

@@ -28,7 +28,7 @@ def url_hour_arg(text, loader_context):
     """ 加上小时的时间戳 """
     from datetime import datetime
     url = loader_context.get('url_hour_arg', '')
-    return url + '#' + datetime.now().strftime('%Y%m%d%H')
+    return url + '#' + datetime.now().strftime('%Y%m%d')
 
 if not hasattr(processors, 'url_hour_arg'):
     setattr(processors, 'url_hour_arg', url_hour_arg)

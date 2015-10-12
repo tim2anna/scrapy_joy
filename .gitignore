@@ -6,3 +6,4 @@ data.db
 items
 logs
 .idea
+*.pid
