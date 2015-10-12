@@ -3,6 +3,7 @@
 {% load filters %}
 
 {% block css %}
+    <link rel="stylesheet" href="/static/DataTables-1.10.9/media/css/dataTables.bootstrap.min.css">
     <style>
         #legend {
             height:350px;
@@ -107,22 +108,26 @@
 
                 <div id="detail" class="tab-pane fade">
                     <table class="table table-striped">
-                        <tr>
-                            <th>统计时间</th>
-                            <th>分类</th>
-                            <th>平台</th>
-                            <th>期限</th>
-                            <th>投资利率</th>
-                        </tr>
-                        {% for data in q %}
-                        <tr>
-                            <td>{{ data.sta_date }}</td>
-                            <td>{{ data.category2 }}</td>
-                            <td>{{ data.site.name }}</td>
-                            <td>{{ data.term }}{{ data.get_term_unit_display }}</td>
-                            <td>{{ data.rate }}%</td>
-                        </tr>
-                        {% endfor %}
+                        <thead>
+                            <tr>
+                                <th>统计时间</th>
+                                <th>分类</th>
+                                <th>平台</th>
+                                <th>期限</th>
+                                <th>投资利率</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in q %}
+                            <tr>
+                                <td>{{ data.sta_date }}</td>
+                                <td>{{ data.category2 }}</td>
+                                <td>{{ data.site.name }}</td>
+                                <td>{{ data.term }}{{ data.get_term_unit_display }}</td>
+                                <td>{{ data.rate|floatformat:2 }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -131,7 +136,8 @@
 {% endblock %}
 
 {% block js %}
-
+    <script type="text/javascript" src="/static/DataTables-1.10.9/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/static/DataTables-1.10.9/media/js/dataTables.bootstrap.min.js"></script>
     <script src="/static/js/echarts.js"></script>
 
     <script type="text/javascript">
@@ -268,6 +274,21 @@
 
             $('.input-daterange input').each(function() {
                 $(this).datepicker({format: "yyyy-mm-dd"});
+            });
+
+            $('#detail table').DataTable({
+                "language": {
+                    "lengthMenu": "每页 _MENU_ 条记录",
+                    "zeroRecords": "没有找到记录",
+                    "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 )",
+                    "infoEmpty": "无记录",
+                    "infoFiltered": "(从 _MAX_ 条记录过滤)",
+                    "sSearch": "搜索",
+                    "paginate": {
+                        "previous": "上一页",
+                        "next": "下一页"
+                    }
+                }
             });
         });
     </script>

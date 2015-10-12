@@ -64,6 +64,7 @@ def week_trends(request):
 
     # 明细数据
     week_dict, series_dict = OrderedDict(), OrderedDict()
+    category2_options, term_options = set(), set()
     for obj in q:
         week = u'%s第%s周' % (obj.sta_date.year, int(obj.sta_date.strftime('%W'))+1)
         if week not in week_dict:
@@ -87,6 +88,9 @@ def week_trends(request):
         series_dict[cat2][term][week].append(
             {'rate': obj.rate, 'sta_cnt': obj.sta_cnt}
         )
+
+        category2_options.add(obj.category2)
+        term_options.add(str(obj.term) + obj.get_term_unit_display())
 
     # 汇总表格数据
     table_data = []
