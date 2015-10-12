@@ -147,7 +147,7 @@ def send_week_email(mail_list=[], today=date.today()):
 
 @task()
 def send_month_email(mail_list=[], today=date.today()):
-    """ 周指数邮件 """
+    """ 月指数邮件 """
     if not mail_list:
         mail_list = [obj.email for obj in SubscribeEmail.objects.all()]
 
