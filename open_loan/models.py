@@ -68,6 +68,7 @@ class Loan(models.Model):
     TERM_UNIT_CHOICES = (
         ('day', u'天'),
         ('month', u'月'),
+        ('year', u'年'),
     )
 
     loan_scraper = models.ForeignKey(LoanScraper, verbose_name=u'标的爬虫')
@@ -103,13 +104,15 @@ class LoanItem(DjangoItem):
 def loan_push_product(sender, **kwargs):
     instance = kwargs.get('instance')
 
-    if instance.term_unit not in ['day', 'month']:
+    if instance.term_unit not in ['day', 'month', 'year']:
         exec(instance.loan_scraper.scraper.comments)
 
     if instance.term_unit == 'day':
         instance.duration = instance.term
     elif instance.term_unit == 'month':
         instance.duration = int(instance.term)*30
+    elif instance.term_unit == 'year':
+        instance.duration = int(instance.term)*360
 
     if instance.loan_scraper:
         instance.site = instance.loan_scraper.site
