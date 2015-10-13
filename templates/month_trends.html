@@ -155,7 +155,8 @@
         var month_list = {},
             chart_data = {{ chart_data|to_json|safe }},
             series = [],
-            legends = [];
+            legends = {{ legends|to_json|safe }},
+            selected = {{ legends_hidden|to_json|safe }};
 
         for(var i=0; i<chart_data.length; i++) {
             var item = chart_data[i];
@@ -168,7 +169,6 @@
             }
             item.data = new_data;
             series.push(item);
-            legends.push(item.name);
         }
 
         require.config({
@@ -191,7 +191,7 @@
                                     ': &nbsp;<span style="color:red;">' + params.value[1].toFixed(2) + '%</span>';
                         }
                     },
-                    legend : {data : legends, y: 'bottom', show: false},
+                    legend : {data : legends, y: 'bottom', show: false, selected: selected},
                     xAxis : [{
                         type : 'time',
                         splitNumber:10,
@@ -226,6 +226,9 @@
                         labelLegend.toggleClass('disabled');
                         legend.setSelected(l, !labelLegend.hasClass('disabled'));
                     });
+                    if(!legend._selectedMap[l]) {
+                        labelLegend.addClass('disabled');
+                    }
                     divLegends.append(labelLegend);
                 });
 

@@ -27,7 +27,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 CACHES = {
     'default': {
@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'kombu.transport.django',
     'djcelery',
     'dynamic_scraper',
+    'debug_toolbar',
 
     'scrapy_joy',
     'open_news',
@@ -66,6 +67,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'scrapy_joy.urls'
@@ -113,7 +115,6 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
-    '/var/www/static/',
 )
 
 TEMPLATE_DIRS = (
@@ -123,6 +124,7 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
 )
 
+# **** 发送邮件设置****
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'kaisa_rate@163.com'
@@ -133,6 +135,29 @@ SERVER_EMAIL = 'kaisa_rate@163.com'
 
 HOST_NAME = 'http://127.0.0.1:8000'
 
+
+# **** cacheops缓存设置 ****
+CACHEOPS_REDIS = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 1,
+    'socket_timeout': 3,
+    'password': '',
+}
+
+CACHEOPS_DEFAULTS = {
+    'timeout': 60*60
+}
+CACHEOPS = {
+    'auth.user': {'ops': 'get', 'timeout': 60*15},
+    'auth.*': {'ops': ('fetch', 'get')},
+    'auth.permission': {'ops': 'all'},
+    '*.*': {},
+}
+
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+INTERNAL_IPS = '127.0.0.1'
 
 # django-celery settings
 import djcelery

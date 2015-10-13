@@ -10,8 +10,9 @@ from django.shortcuts import render_to_response, HttpResponse
 from django.db.models import Sum, Avg
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.views.decorators.csrf import csrf_protect
+from cacheops import cached_view, cached_view_as
 
-from open_loan.models import Loan, LoanWebsite, StaDayData, SubscribeEmail
+from open_loan.models import Loan, LoanWebsite, StaDayData, SubscribeEmail, Legend
 from open_loan.helpers import get_sta_time_by_week, get_sta_time_by_month
 from open_loan.forms import SubscribeForm
 from open_loan.tasks import send_week_email
@@ -35,12 +36,16 @@ def index(request):
     this_week_loan_rate = this_week_loans.aggregate(avg=Avg('year_rate'))['avg'] or 0
     last_week_loan_rate = last_week_loans.aggregate(avg=Avg('year_rate'))['avg'] or 0
 
-    this_week_loan_amount = this_week_loans.aggregate(sum=Sum('amount'))['sum'] or 0
-    last_week_loan_amount = last_week_loans.aggregate(sum=Sum('amount'))['sum'] or 0
+    # this_week_loan_amount = this_week_loans.aggregate(sum=Avg('amount'))['sum'] or 0
+    # last_week_loan_amount = last_week_loans.aggregate(sum=Sum('amount'))['sum'] or 0
+
+    this_week_loan_duration = this_week_loans.aggregate(avg=Avg('duration'))['avg'] or 0
+    last_week_loan_duration = last_week_loans.aggregate(avg=Avg('duration'))['avg'] or 0
 
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
+# @cached_view(timeout=60*30)
 def week_trends(request):
     """ 周指数 """
     current_menu = 'week_trends'
@@ -58,13 +63,12 @@ def week_trends(request):
     else:
         end_date = today + timedelta(-1 - today.weekday())  # 上周的星期天
 
-    q = StaDayData.objects.filter(
+    q = StaDayData.objects.select_related('category2', 'site').filter(
         category1=None, sta_date__range=(start_date, end_date)
     ).order_by('category2', 'term', '-sta_date')
 
     # 明细数据
     week_dict, series_dict = OrderedDict(), OrderedDict()
-    category2_options, term_options = set(), set()
     for obj in q:
         week = u'%s第%s周' % (obj.sta_date.year, int(obj.sta_date.strftime('%W'))+1)
         if week not in week_dict:
@@ -89,9 +93,6 @@ def week_trends(request):
             {'rate': obj.rate, 'sta_cnt': obj.sta_cnt}
         )
 
-        category2_options.add(obj.category2)
-        term_options.add(str(obj.term) + obj.get_term_unit_display())
-
     # 汇总表格数据
     table_data = []
     for week, cat_dict in week_dict.items():
@@ -106,7 +107,8 @@ def week_trends(request):
                 ))
 
     # 折线图数据
-    chart_data = []
+    chart_data, legends, legends_hidden = [], [], {}
+    legends_dict = dict([(i.name, i.sort_num) for i in Legend.objects.filter(is_show=True).order_by('sort_num')])
     for cat, term_dict in series_dict.items():
         for term, week_dict in term_dict.items():
             data = []
@@ -115,16 +117,25 @@ def week_trends(request):
                     week,
                     sum([item['rate']*item['sta_cnt'] for item in item_list]) / sum([item['sta_cnt'] for item in item_list])
                 ])
+            legend = cat + '-' + term
             chart_data.append({
-                'name': cat + '-' + term,
+                'name': legend,
                 'type': 'line',
                 'showAllSymbol': True,
                 'data': data
             })
 
+            legends_hidden[legend] = True if legend in legends_dict else False
+            legends.append({'name': legend, 'sort_num': legends_dict.get(legend, 100)})
+
+    # 对图例排序
+    legends.sort(lambda x, y: cmp(x['sort_num'], y['sort_num']))
+    legends = [i['name'] for i in legends]
+
     return render_to_response('week_trends.html', locals(), context_instance=RequestContext(request))
 
 
+# @cached_view(timeout=60*30)
 def month_trends(request):
     """ 月指数 """
     current_menu = 'month_trends'
@@ -147,7 +158,7 @@ def month_trends(request):
     else:
         end_date = date(day=1, month=today.month, year=today.year) - timedelta(days=1)  # 上月最后一天
 
-    q = StaDayData.objects.filter(
+    q = StaDayData.objects.select_related('category2', 'site').filter(
         category1=None, sta_date__range=(start_date, end_date)
     ).order_by('-sta_date', 'category2', 'term')
 
@@ -191,7 +202,8 @@ def month_trends(request):
                 ))
 
     # 折线图数据
-    chart_data = []
+    chart_data, legends, legends_hidden = [], [], {}
+    legends_dict = dict([(i.name, i.sort_num) for i in Legend.objects.filter(is_show=True).order_by('sort_num')])
     for cat, term_dict in series_dict.items():
         for term, month_dict in term_dict.items():
             data = []
@@ -200,12 +212,20 @@ def month_trends(request):
                     month,
                     sum([item['rate']*item['sta_cnt'] for item in item_list]) / sum([item['sta_cnt'] for item in item_list])
                 ])
+            legend = cat + '-' + term
             chart_data.append({
-                'name': cat + '-' + term,
+                'name': legend,
                 'type': 'line',
                 'showAllSymbol': True,
                 'data': data
             })
+
+            legends_hidden[legend] = True if legend in legends_dict else False
+            legends.append({'name': legend, 'sort_num': legends_dict.get(legend, 100)})
+
+    # 对图例排序
+    legends.sort(lambda x, y: cmp(x['sort_num'], y['sort_num']))
+    legends = [i['name'] for i in legends]
 
     return render_to_response('month_trends.html', locals(), context_instance=RequestContext(request))
 

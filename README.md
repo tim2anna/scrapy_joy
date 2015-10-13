@@ -54,6 +54,24 @@
 * uwsgi静态文件设置：
         
         copy静态文件到项目根目录
+        
+* 安装redis:
+
+        yum install gcc-c++
+        yum install -y tcl
+        yum install wget
+        
+        wget http://download.redis.io/releases/redis-3.0.4.tar.gz
+        tar -zxvf redis-3.0.4.tar.gz
+        cd redis-3.0.4
+        make
+        make install
+        mkdir -p /etc/redis
+        cp redis.conf /etc/redis
+        vim /etc/redis/redis.conf
+        仅修改： daemonize yes （no-->yes）
+        /usr/local/bin/redis-server /etc/redis/redis.conf
+        ps -ef|grep redis
 
 
 ## 增加新平台流程

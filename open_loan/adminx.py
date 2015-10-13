@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import xadmin
-from open_loan.models import Loan, LoanCategory, LoanScraper, LoanWebsite
+from open_loan.models import Loan, LoanCategory, LoanScraper, LoanWebsite, Legend
 
 
 class LoanAdmin(object):
@@ -34,3 +34,11 @@ class LoanWebsiteAdmin(object):
     list_filter = ['area']
 
 xadmin.site.register(LoanWebsite, LoanWebsiteAdmin)
+
+
+class LegendAdmin(object):
+    list_display = ('name', 'is_show', 'sort_num', 'category')
+    ordering = ('-is_show', 'sort_num')
+    list_editable = ('sort_num', 'is_show')
+
+xadmin.site.register(Legend, LegendAdmin)

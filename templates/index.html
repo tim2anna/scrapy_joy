@@ -87,24 +87,23 @@
                 </div>
             </div>
         </div>
+
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <h5 class="margin-top-none">新标<span class="label label-danger pull-right">本周</span></h5>
+                    <h5 class="margin-top-none">期限<span class="label label-danger pull-right">本周</span></h5>
 
                     <h1 class="text-center">
-                        <i class="fa fa-cny"></i>
-                        {{ this_week_loan_amount|floatformat:0|amount_split }}
+                        {{ this_week_loan_duration|floatformat:2 }}天
                     </h1>
 
-                    <p class="small text-muted text-center">总金额</p>
+                    <p class="small text-muted text-center">平均</p>
                 </div>
                 <div class="panel-footer">
                     上周
                     <span class="text-danger pull-right">
-                        <i class="fa fa-cny"></i>
-                        {{ last_week_loan_amount|floatformat:0|amount_split }}
-                        {% if this_week_loan_amount > last_week_loan_amount %}
+                        {{ last_week_loan_duration|floatformat:2 }}
+                        {% if this_week_loan_duration > last_week_loan_duration %}
                             <i class="fa fa-fw fa-level-up"></i>
                         {% else %}
                             <i class="fa fa-fw fa-level-down"></i>
@@ -113,6 +112,33 @@
                 </div>
             </div>
         </div>
+
+{#        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">#}
+{#            <div class="panel panel-default">#}
+{#                <div class="panel-body">#}
+{#                    <h5 class="margin-top-none">新标<span class="label label-danger pull-right">本周</span></h5>#}
+{##}
+{#                    <h1 class="text-center">#}
+{#                        <i class="fa fa-cny"></i>#}
+{#                        {{ this_week_loan_amount|floatformat:0|amount_split }}#}
+{#                    </h1>#}
+{##}
+{#                    <p class="small text-muted text-center">总金额</p>#}
+{#                </div>#}
+{#                <div class="panel-footer">#}
+{#                    上周#}
+{#                    <span class="text-danger pull-right">#}
+{#                        <i class="fa fa-cny"></i>#}
+{#                        {{ last_week_loan_amount|floatformat:0|amount_split }}#}
+{#                        {% if this_week_loan_amount > last_week_loan_amount %}#}
+{#                            <i class="fa fa-fw fa-level-up"></i>#}
+{#                        {% else %}#}
+{#                            <i class="fa fa-fw fa-level-down"></i>#}
+{#                        {% endif %}#}
+{#                    </span>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
     </div>
 {% endblock %}
 

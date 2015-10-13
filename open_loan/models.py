@@ -135,5 +135,18 @@ class StaDayData(models.Model):
 
 
 class SubscribeEmail(models.Model):
+    """ 订阅邮箱 """
     email = models.EmailField(u'邮箱')
     created = models.DateTimeField(u'订阅时间', auto_now_add=True)
+
+
+class Legend(models.Model):
+    """ 图例 """
+    name = models.CharField(u'名称', max_length=20)
+    is_show = models.BooleanField(u'是否显示', default=False)
+    sort_num = models.IntegerField(u'排序号', default=1)
+    category = models.CharField(u'分类', max_length=20, null=True, blank=True)
+
+    class Meta:
+        verbose_name = u'图例'
+        verbose_name_plural = u'图例'
