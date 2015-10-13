@@ -45,7 +45,7 @@ def index(request):
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
-# @cached_view(timeout=60*30)
+@cached_view(timeout=60*20)
 def week_trends(request):
     """ 周指数 """
     current_menu = 'week_trends'
@@ -135,7 +135,7 @@ def week_trends(request):
     return render_to_response('week_trends.html', locals(), context_instance=RequestContext(request))
 
 
-# @cached_view(timeout=60*30)
+@cached_view(timeout=60*20)
 def month_trends(request):
     """ 月指数 """
     current_menu = 'month_trends'
