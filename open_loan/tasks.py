@@ -180,4 +180,22 @@ def send_month_email(mail_list=[], today=date.today()):
 
 
 if __name__ == "__main__":
-    run_sta_day_data()
+
+    year = int(raw_input("请输入年份:"))
+    month = int(raw_input("请输入月份:"))
+
+    # 开始时间
+    start_day = date(year=year, month=month, day=1)
+    # 结束时间
+    if 0 < month < 12:
+        end_day = date(year=year, month=(month+1), day=1)
+
+    elif month == 12:
+        end_day = date(year=(year+1), month=1, day=1)
+
+    else:
+        print "输入月份" + str(month) + "有误"
+
+    while start_day < end_day:
+        run_sta_day_data(start_day)
+        start_day = start_day + timedelta(days=1)
